@@ -67,6 +67,7 @@ nav{
   align-items: end;
   height: 100%;
   overflow: hidden;
+  gap: 5px;
 }
 
 p {
