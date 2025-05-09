@@ -1,0 +1,226 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --gris: #E0E0E0;
+  --gris-claro: #EEEEEE;
+  --starship: #077A7D;
+  --heavyMetal: #EEEEEE;
+  --drover: #A6D6D6;
+  --sycamore: hsl(182, 89%, 20%);
+  --white: #fff;
+  --max-width: 1400px;
+  --padding: 10px;
+  --margin: 10px;
+}
+
+::selection {
+  background: var(--sycamore);
+}
+
+body {
+  background: var(--gris-claro);
+  color: var(--starship);
+  line-height: 24px;
+  font-size: 16px;
+  font-family: "Montserrat", sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: end;
+  height: 70px;
+  max-width: max-content;
+  min-width: max-content;
+  margin: 0 auto;
+  background: var(--gris-claro);
+  color: var(--starship);
+  border-bottom: solid 4px var(--sycamore);
+  margin-bottom: var(--margin);
+}
+
+section {
+  padding: var(--padding);
+}
+
+a {
+  color: var(--starship);
+  text-decoration: none;
+}
+
+h1{
+  font-size: 2rem;
+}
+
+h1, h2 {
+  padding: var(--padding);
+  text-align: center;
+}
+
+nav{
+  display: flex;
+  align-items: end;
+  height: 100%;
+  overflow: hidden;
+}
+
+p {
+  font-size: 1rem;
+  margin: 0 0 var(--margin);
+  color: var(--white);
+}
+
+ul {
+  list-style: none;
+  display: flex;
+}
+
+ul.list>li.item {
+  cursor: pointer;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--padding);
+}
+
+.card {
+  max-width: 450px;
+  min-width: 385px;
+  border: solid 2px var(--sycamore);
+  background-color: var(--gris);
+  margin: var(--margin) auto;
+  padding: 15px 0;
+  border-radius: 20px;
+  box-shadow: 0 3px 5px 0 var(--starship);
+}
+
+.title{
+  width: 200px;
+  height: 100%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  background-color: var(--sycamore);
+  color: var(--gris-claro);
+  padding-bottom: 12px;
+  box-shadow: 0 0px 5px 1px var(--starship);
+}
+
+.list{
+  padding-bottom: 8px;
+}
+
+.item {
+  transition: 0.5s;
+  font-size: 1.1rem;
+  width: 120px;
+  text-align: center;
+}
+
+.item:hover {
+  font-weight: bold;
+}
+
+.item--selected {
+  font-weight: bold;
+}
+
+.center {
+  text-align: center;
+}
+
+form {
+  padding: var(--padding);
+}
+
+input, select {
+  display: block;
+  width: 90%;
+  padding: calc(var(--padding));
+  margin: var(--margin) auto;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: var(--sycamore);
+}
+
+button {
+  display: block;
+  width: 90%;
+  margin: var(--margin) auto;
+  padding: var(--padding);
+  background: var(--gris);
+  color: var(--starship);
+  border: solid 1px var(--starship);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: 0.5s;
+}
+
+button:hover {
+  background: var(--starship);
+  color: var(--heavyMetal);
+  box-shadow: 0 0 4px 0 var(--sycamore);
+}
+
+.btn {
+  display: block;
+  width: 90%;
+  margin: var(--margin) auto;
+  padding: var(--padding);
+  background: var(--starship);
+  color: var(--heavyMetal);
+  border: solid 1px var(--starship);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: 1s;
+  text-align: center;
+  font-weight: 500;
+}
+
+.btn:hover {
+  background: var(--heavyMetal);
+  color: var(--starship);
+}
+
+.borde-rojo {
+  box-shadow: 0 0 3px 1px #c50606;
+  border-radius: 10px;
+}
+
+.texto-advertencia {
+  display: flex;
+  font-size: 12px;
+  color: #c50606;  
+  font-weight: bold;
+  justify-content: end;
+  margin: -10px 25px -5px;
+}
+
+.form__generos, .form__habilidades{
+  margin: var(--margin);
+  padding: var(--padding) 15px;
+}
+
+.politica, .genero, .habilidad{
+  display: flex;
+  align-items: center;
+  margin: 0 30px;
+}
+
+input[type="radio"], input[type="checkbox"] {
+  display: inline;
+  width: auto;
+  margin: 0 10px 0 0;
+}
