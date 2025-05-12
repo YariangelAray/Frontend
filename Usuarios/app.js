@@ -1,5 +1,6 @@
 //importaciones
 import { validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "../validaciones.js";
+import obtenerDatos from "../Helpers/realizarPeticion.js";
 
 // variables
 const formulario = document.querySelector('form');
@@ -14,7 +15,7 @@ const usuario = document.querySelector('[name="usuario"]');
 const contrasena = document.querySelector('[name="contrasena"]');
 
 const generos = document.querySelectorAll('[name="genero"]')
-const habilidades = document.querySelectorAll('[name="habilidades[]"]')
+const lenguajes = document.querySelectorAll('[name="lenguajes[]"]')
 
 const checkBox = document.querySelector('[name="politica"]');
 
@@ -26,25 +27,109 @@ const habilitarBoton = () => {
   else if (boton.disabled) boton.removeAttribute('disabled');
 }
 
+const cargarGeneros = async () => {
+  const generos = await obtenerDatos('generos');
+  console.log(generos);
+  
+  const contenedor = document.querySelector('.form__generos');
+
+  generos.forEach((genero) => {
+    const label = document.createElement('label');
+    label.textContent = genero.nombre;  
+    label.setAttribute('for', 'gen__' + genero.id);
+    label.setAttribute('class', 'genero');
+    
+    const input = document.createElement('input');
+    input.setAttribute('type', 'radio');
+    input.setAttribute('name', 'genero');
+    input.setAttribute('value', genero.id);
+    input.setAttribute('id', 'gen__' + genero.id);
+    input.setAttribute('required', '');
+    
+    label.insertAdjacentElement('afterbegin', input);
+    contenedor.append(label);
+  });
+}
+cargarGeneros();
+
+const cargarCiudades = async () =>{
+  const ciudades = await obtenerDatos('ciudades');
+  console.log(ciudades);
+  
+  const contenedor = document.querySelector('.form__control select');
+
+  ciudades.forEach((ciudad) => {
+    const option = document.createElement('option');
+    option.textContent = ciudad.nombre;
+    option.setAttribute('value', ciudad.id);
+    contenedor.append(option);
+  });  
+}
+cargarCiudades();
+
+const cargarLenguajes = async () => {
+  const lenguajes = await obtenerDatos('lenguajes');
+  console.log(lenguajes);
+  
+  const contenedor = document.querySelector('.form__lenguajes');
+
+  lenguajes.forEach((lenguaje) => {
+    const label = document.createElement('label');
+    label.textContent = lenguaje.nombre;  
+    label.setAttribute('for', 'leng__' + lenguaje.id);
+    label.setAttribute('class', 'lenguaje');
+    
+    const input = document.createElement('input');
+    input.setAttribute('type', 'checkbox');
+    input.setAttribute('name', 'lenguajes[]');
+    input.setAttribute('id', 'leng__' + lenguaje.id);
+    input.setAttribute('value', lenguaje.id);
+    input.setAttribute('required', '');
+    
+    label.insertAdjacentElement('afterbegin', input);
+    contenedor.append(label);
+  });
+}
+cargarLenguajes();
+
 const crearTabla = () => {
-  const primeraSeccion = document.querySelector('section:first-child');
+  const main = document.querySelector('main');
 
   const tabla = document.createElement('table');
+  tabla.classList.add('tabla'); // clase BEM principal
+
   const tablaHeader = document.createElement('thead');
+  tablaHeader.classList.add('tabla__encabezado');
   tabla.append(tablaHeader);
-  const tablaColumna = document.createElement('tr');
-  tablaHeader.append(tablaColumna);
-  const tablaTitulo = document.createElement('th');
-  tablaTitulo.textContent = "Hola";
-  tablaColumna.append(tablaTitulo);
+
+  const tablaFila = document.createElement('tr');
+  tablaFila.classList.add('tabla__fila');
+  tablaHeader.append(tablaFila);
+
+  const encabezados = [
+    "ID", "Nombre Completo", "Teléfono", "Ciudad",
+    "Género", "N° Documento", "Lenguajes", "Usuario"
+  ];
+
+  encabezados.forEach((texto) => {
+    const th = document.createElement('th');
+    th.classList.add('tabla__celda', 'tabla__celda--encabezado');
+    th.textContent = texto;
+    tablaFila.append(th);
+  });
 
   const segundaSeccion = document.createElement('section');
   const div = document.createElement('div');
   div.classList.add('container');
+
+  const titulo = document.createElement('h2');
+  titulo.textContent = "Lista de usuarios";
+  titulo.classList.add('center');
+
   segundaSeccion.append(div);
-  div.append(tabla);
+  div.append(titulo, tabla);
   
-  primeraSeccion.insertAdjacentElement('afterend', segundaSeccion);
+  main.append(segundaSeccion);
 }
 
 //eventos
@@ -69,7 +154,7 @@ contrasena.addEventListener('blur', validarCampo);
   campo.addEventListener('change', validarCheckeo);
 });
 
-[...habilidades].forEach((campo) => {
+[...lenguajes].forEach((campo) => {
   campo.addEventListener('change', validarCheckeo);
 });
 
@@ -85,5 +170,34 @@ formulario.addEventListener('submit', (event) => {
     event.target.reset();
 
     boton.setAttribute('disabled', '');
+  }
+});
+
+addEventListener('DOMContentLoaded', async () => {
+  const usuarios = await obtenerDatos('usuarios');
+
+  if (usuarios.length > 0) {
+    crearTabla();
+
+    const tabla = document.querySelector('.tabla');
+    const tablaBody = document.createElement('tbody');
+    tablaBody.classList.add('tabla__cuerpo');
+    tabla.append(tablaBody);
+
+    usuarios.forEach((usuario) => {
+      const fila = document.createElement('tr');
+      fila.classList.add('tabla__fila');
+      tablaBody.append(fila);
+
+      const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
+      usuario.telefono, usuario.ciudad, usuario.genero, usuario.no_documento, '', usuario.usuario];
+
+      celdas.forEach((texto) => {
+        const celda = document.createElement('td');
+        celda.classList.add('tabla__celda');
+        celda.textContent = texto;
+        fila.append(celda);
+      });
+    });
   }
 });

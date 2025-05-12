@@ -60,13 +60,13 @@ const validarRadiosButton = (radiosButton) => {
   return radioCheckeado;
 }
 
-const validarCheckboxs = (checkBoxs, minHabilidades) => {  
+const validarCheckboxs = (checkBoxs, minLenguajes) => {  
   const checkBoxsList = [...checkBoxs].filter((checkbox) => checkbox.checked);
-  const contenedor = document.querySelector('.form__habilidades');
+  const contenedor = document.querySelector('.form__lenguajes');
   
-  if (checkBoxsList.length < minHabilidades) {
+  if (checkBoxsList.length < minLenguajes) {
     agregarError(contenedor);
-    contenedor.nextElementSibling.textContent = `El número de habilidades mínimo es ${minHabilidades}.`;
+    contenedor.nextElementSibling.textContent = `El número de lenguajes mínimo es ${minLenguajes}.`;
   }
   else if (contenedor.className.includes('borde-rojo')) quitarError(contenedor);
   
@@ -101,14 +101,14 @@ export const validarCampos = (event) => {
     else datos.genero = radioCheckeado.value;    
   }
 
-  const contenedorHabilidades = document.querySelector('.form__habilidades');
-  if (contenedorHabilidades) {
-    const minHabilidades = contenedorHabilidades.dataset.habilidades;
+  const contenedorLenguajes = document.querySelector('.form__lenguajes');
+  if (contenedorLenguajes) {
+    const minLenguajes = contenedorLenguajes.dataset.lenguajes;
   
     const checkBoxs = [...campos].filter((campo) => campo.type === 'checkbox');
-    const checkBoxsList = validarCheckboxs(checkBoxs, minHabilidades);
+    const checkBoxsList = validarCheckboxs(checkBoxs, minLenguajes);
   
-    if (checkBoxsList.length < minHabilidades) valido = false;
+    if (checkBoxsList.length < minLenguajes) valido = false;
     else datos[checkBoxs[0].name] = checkBoxsList.map((check) => check.value);    
   }
 
