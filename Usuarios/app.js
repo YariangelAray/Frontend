@@ -50,7 +50,6 @@ const cargarGeneros = async () => {
   });
 
 }
-cargarGeneros();
 
 const cargarCiudades = async () =>{
   const ciudades = await obtenerDatos('ciudades');
@@ -65,7 +64,6 @@ const cargarCiudades = async () =>{
     contenedor.append(option);
   });  
 }
-cargarCiudades();
 
 const cargarLenguajes = async () => {
   const lenguajes = await obtenerDatos('lenguajes');
@@ -93,7 +91,7 @@ const cargarLenguajes = async () => {
     contenedor.append(label);
   });
 }
-cargarLenguajes();
+
 
 const crearTabla = () => {
   const main = document.querySelector('main');
@@ -111,7 +109,7 @@ const crearTabla = () => {
 
   const encabezados = [
     "ID", "Nombre Completo", "Teléfono", "Ciudad",
-    "Género", "N° Documento", "Lenguajes", "Usuario"
+    "Género", "N° Documento", "Usuario", "Lenguajes"
   ];
 
   encabezados.forEach((texto) => {
@@ -156,61 +154,66 @@ contrasena.addEventListener('blur', validarCampo);
 formulario.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  if (validarCampos(event)) {
+  if (!validarCampos(event)) return;
 
-    console.log("Datos guardados:", datos);
+  console.log(datos);
+  
+  const respuesta = await crear("usuarios", datos);    
+  
+  if (!respuesta.ok) {
+    alert(`Error al crear el usuario \n❌ ${(await respuesta.json()).error}`);
+    return;
+  }    
+  
+  alert("Formulario enviado.");
+  event.target.reset();
 
-    alert("Formulario enviado.");
-    event.target.reset();
+  boton.setAttribute('disabled', '');
 
-    boton.setAttribute('disabled', '');
+  const usuarioCreado = (await respuesta.json()).usuarioCreado;
 
-    const respuesta = await crear("usuarios", datos);    
-
-    if (!respuesta.ok) {
-      alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).error}`);
-      return;
-    }    
-
-    const usuarioCreado = (await respuesta.json()).usuarioCreado;
-
-    datos.lenguajes.forEach(async(lenguaje) =>{
-      console.log(lenguaje);
-      await crear("lenguajes_usuarios", { id_usuario: usuarioCreado.id, id_lenguaje: lenguaje });
-    });
-    location.reload();
-  }
+  datos.lenguajes.forEach(async(lenguaje) =>{      
+    await crear("lenguajes_usuarios", { id_usuario: usuarioCreado.id, id_lenguaje: lenguaje });
+  });
+  // location.reload();
+  
 });
 
 addEventListener('DOMContentLoaded', async () => {
+
+  await cargarCiudades();
+  await cargarGeneros();
+  await cargarLenguajes();
+
   const usuarios = await obtenerDatos('usuarios');
 
-  if (usuarios.length > 0) {
-    crearTabla();
+  if (usuarios.length === 0) return;
+  
+  crearTabla();
 
-    const tabla = document.querySelector('.tabla');
-    const tablaBody = document.createElement('tbody');
-    tablaBody.classList.add('tabla__cuerpo');
-    tabla.append(tablaBody);
+  const tabla = document.querySelector('.tabla');
+  const tablaBody = document.createElement('tbody');
+  tablaBody.classList.add('tabla__cuerpo');
+  tabla.append(tablaBody);
 
-    usuarios.forEach((usuario) => {
-      const fila = document.createElement('tr');
-      fila.classList.add('tabla__fila');
-      tablaBody.append(fila);
+  usuarios.forEach((usuario) => {
+    const fila = document.createElement('tr');
+    fila.classList.add('tabla__fila');
+    tablaBody.append(fila);
 
-      const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
-      usuario.telefono, usuario.ciudad, usuario.genero, usuario.documento, usuario.lenguajes.join(", ") , usuario.usuario];
+    const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
+    usuario.telefono, usuario.ciudad, usuario.genero, usuario.documento, usuario.usuario, usuario.lenguajes.join(", ") ];
 
-      celdas.forEach((texto) => {
-        const celda = document.createElement('td');
-        celda.classList.add('tabla__celda');
-        celda.textContent = texto;
-        fila.append(celda);
-      });
-
-      fila.addEventListener('click', () => {
-        window.location.href = `usuarioGestion.html?id=${usuario.id}`;
-      });
+    celdas.forEach((texto) => {
+      const celda = document.createElement('td');
+      celda.classList.add('tabla__celda');
+      celda.textContent = texto;
+      fila.append(celda);
     });
-  }
+
+    fila.addEventListener('click', () => {
+      window.location.href = `usuarioGestion.html?id=${usuario.id}`;
+    });
+  });
+  
 });

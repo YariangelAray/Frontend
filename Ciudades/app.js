@@ -56,19 +56,18 @@ nombre.addEventListener('blur', validarCampo);
 formulario.addEventListener('submit', async (event) => {
   event.preventDefault();
   
-  if (validarCampos(event)) {
+  if (!validarCampos(event)) return;
 
-    const respuesta = await crear("ciudades", datos);
-    
-    if (!respuesta.ok) {
-      alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).error}`);
-      return;
-    }
-    
-    alert("Formulario enviado.");
-    event.target.reset();
-    location.reload();
+  const respuesta = await crear("ciudades", datos);
+  
+  if (!respuesta.ok) {
+    alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).error}`);
+    return;
   }
+  
+  alert("Formulario enviado.");
+  event.target.reset();
+  location.reload();
 });
 
 

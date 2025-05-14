@@ -6,8 +6,8 @@ const id = urlParams.get('id');
 const ciudad = await obtenerDatos(`ciudades/${id}`);
 
 const tituloPagina = document.querySelector('title');
-const nombre = document.querySelector('[name="nombre"]');
 const titulo = document.querySelector('h1');
+const nombre = document.querySelector('[name="nombre"]');
 
 const formulario = document.querySelector('form');
 const btnEliminar = document.querySelector('#btn_eliminar');
@@ -16,8 +16,7 @@ const btnEliminar = document.querySelector('#btn_eliminar');
 const asignarValores = async () => {
   tituloPagina.textContent = ciudad.nombre;
 
-  nombre.value = ciudad.nombre;
-  nombre.textContent = ciudad.nombre;
+  nombre.value = ciudad.nombre;  
   titulo.textContent = ciudad.nombre;
 }
 
@@ -34,27 +33,30 @@ formulario.addEventListener('submit', async (event) => {
     return;
   }
 
-  if (validarCampos(event)) {
-    const respuesta = await actualizar(`ciudades/${id}`, datos);
-    if (!respuesta.ok) {        
-      alert(`Error al actualizar la ciudad: \n❌ ${(await respuesta.json()).error}`);
-      return;
-    }
-    alert("Ciudad actualizada.");
-    location.reload();
+  if (!validarCampos(event)) return;
+  console.log(datos);
+  
+
+  const respuesta = await actualizar(`ciudades/${id}`, datos);
+  if (!respuesta.ok) {        
+    alert(`Error al actualizar la ciudad: \n❌ ${(await respuesta.json()).error}`);
+    return;
   }
+  alert("Ciudad actualizada.");
+  location.reload();
 });
 
 btnEliminar.addEventListener('click', async (event) => {
   const confirmacion = confirm("¿Está seguro de que desea eliminar esta ciudad?");
   
-  if (confirmacion) {
-    const respuesta = await eliminar(`ciudades/${id}`);    
-    if (!respuesta.ok) {            
-      alert(`Error al eliminar la ciudad: \n❌ ${(await respuesta.json()).error}`);            
-      return;
-    }
-    alert("Ciudad eliminada.");
-    window.location.href = "ciudad.html";
+  if (!confirmacion) return;
+  
+  const respuesta = await eliminar(`ciudades/${id}`);    
+  if (!respuesta.ok) {            
+    alert(`Error al eliminar la ciudad: \n❌ ${(await respuesta.json()).error}`);            
+    return;
   }
+  alert("Ciudad eliminada.");
+  window.location.href = "ciudad.html";
+  
 });

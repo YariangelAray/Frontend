@@ -57,21 +57,21 @@ nombre.addEventListener('blur', validarCampo);
 formulario.addEventListener('submit', async(event) => {
   event.preventDefault();
   
-  if (validarCampos(event)) {
+  if (!validarCampos(event)) return;
 
-    console.log("Datos guardados:", datos);
+  console.log("Datos guardados:", datos);
 
-    alert("Formulario enviado.");
-    event.target.reset();
+  alert("Formulario enviado.");
+  event.target.reset();
 
-    const respuesta = await crear("lenguajes", datos);
+  const respuesta = await crear("lenguajes", datos);
 
-    if (!respuesta.ok) {
-      alert(`Error al crear el lenguaje: \n❌ ${(await respuesta.json()).error}`);
-      return;
-    }
-    location.reload();
+  if (!respuesta.ok) {
+    alert(`Error al crear el lenguaje: \n❌ ${(await respuesta.json()).error}`);
+    return;
   }
+  location.reload();
+  
 });
 
 addEventListener('DOMContentLoaded', async () => {
