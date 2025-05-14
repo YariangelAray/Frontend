@@ -44,7 +44,7 @@ const quitarError = (campo) => {
 
 export const validarCheckeo = (event) => {
   const contenedor = event.target.parentElement.parentElement;
-
+  
   if (event.target.type == 'checkbox' && !event.target.checked) agregarError(contenedor);
   else if (contenedor.className.includes('borde-rojo')) quitarError(contenedor);
 }
@@ -78,7 +78,7 @@ export const validarCampos = (event) => {
   let valido = true;
   let regexContra = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W).{8,}$/;
 
-  const campos = [...event.target].filter((elemento) => elemento.hasAttribute('required') && elemento.tagName == 'INPUT' || elemento.tagName == 'SELECT');  
+  const campos = [...event.target].filter((elemento) => elemento.hasAttribute('required') && (elemento.tagName == 'INPUT' || elemento.tagName == 'SELECT'));  
 
   campos.forEach((campo) => {
 
@@ -94,11 +94,11 @@ export const validarCampos = (event) => {
   });
 
   const radiosButton = [...campos].filter((campo) => campo.type === 'radio');
-  if (!radiosButton) {
+  if (radiosButton.length > 0) {
     const radioCheckeado = validarRadiosButton(radiosButton);
-  
+    
     if (!radioCheckeado) valido = false;
-    else datos.genero = radioCheckeado.value;    
+    else datos.id_genero = radioCheckeado.value;    
   }
 
   const contenedorLenguajes = document.querySelector('.form__lenguajes');

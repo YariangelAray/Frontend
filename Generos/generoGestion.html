@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ciudades</title>
+  <title>Género</title>
   <link rel="stylesheet" href="../style.css">
 </head>
 <body>
@@ -11,11 +11,11 @@
   <header>
     <nav>
       <ul class="list">
-        <li class="item item--selected"><a href="">Ciudades</a></li>
-        <li class="item"><a href="../Generos/genero.html">Géneros</a></li>
+        <li class="item"><a href="../Ciudades/ciudad.html">Ciudades</a></li>
+        <li class="item"><a href="genero.html">Géneros</a></li>
       </ul>
 
-      <h1 class="title">Ciudades</h1>
+      <h1 class="title">Género</h1>
 
       <ul class="list">
         <li class="item"><a href="../Lenguaje/lenguaje.html">Lenguajes</a></li>
@@ -29,21 +29,22 @@
 
       <div class="container">
         <div class="card">
-          <h2 class="center">Ingrese los datos de la ciudad</h2>
+          <h2 class="center">Ingrese los datos del género</h2>
 
           <form action="#" novalidate>
             <div class="form__control">
-              <input type="text" name= "nombre" placeholder="Ciudad" required>
+              <input type="text" name= "nombre" placeholder="Género" required>
             </div>
 
-            <button type="submit" id="btn_validar">Enviar</button>
+            <button type="submit" id="btn_actualizar">Actualizar</button>
+            <button type="button" id="btn_eliminar">Eliminar</button>
           </form>
         </div>
       </div>
     </section>
 
   </main>
+  <script src="gestion.js" type="module"></script>
 
-    <script src="app.js" type="module"></script>
 </body>
 </html>

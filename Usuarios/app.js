@@ -1,6 +1,6 @@
 //importaciones
 import { validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "../validaciones.js";
-import obtenerDatos from "../Helpers/realizarPeticion.js";
+import { obtenerDatos, crear } from "../Helpers/realizarPeticion.js";
 
 // variables
 const formulario = document.querySelector('form');
@@ -9,13 +9,10 @@ const boton = document.querySelector('#btn_validar');
 const nombre = document.querySelector('[name="nombre"]');
 const apellido = document.querySelector('[name="apellido"]');
 const telefono = document.querySelector('[name="telefono"]');
-const ciudad = document.querySelector('[name="ciudad"]');
 const documento = document.querySelector('[name="documento"]');
 const usuario = document.querySelector('[name="usuario"]');
 const contrasena = document.querySelector('[name="contrasena"]');
-
-const generos = document.querySelectorAll('[name="genero"]')
-const lenguajes = document.querySelectorAll('[name="lenguajes[]"]')
+const ciudad = document.querySelector('[name="id_ciudad"]');
 
 const checkBox = document.querySelector('[name="politica"]');
 
@@ -29,7 +26,7 @@ const habilitarBoton = () => {
 
 const cargarGeneros = async () => {
   const generos = await obtenerDatos('generos');
-  console.log(generos);
+  // console.log(generos);
   
   const contenedor = document.querySelector('.form__generos');
 
@@ -41,20 +38,23 @@ const cargarGeneros = async () => {
     
     const input = document.createElement('input');
     input.setAttribute('type', 'radio');
-    input.setAttribute('name', 'genero');
+    input.setAttribute('name', 'id_genero');
     input.setAttribute('value', genero.id);
     input.setAttribute('id', 'gen__' + genero.id);
     input.setAttribute('required', '');
     
     label.insertAdjacentElement('afterbegin', input);
     contenedor.append(label);
+
+    input.addEventListener('change', validarCheckeo);
   });
+
 }
 cargarGeneros();
 
 const cargarCiudades = async () =>{
   const ciudades = await obtenerDatos('ciudades');
-  console.log(ciudades);
+  // console.log(ciudades);
   
   const contenedor = document.querySelector('.form__control select');
 
@@ -69,7 +69,7 @@ cargarCiudades();
 
 const cargarLenguajes = async () => {
   const lenguajes = await obtenerDatos('lenguajes');
-  console.log(lenguajes);
+  // console.log(lenguajes);
   
   const contenedor = document.querySelector('.form__lenguajes');
 
@@ -81,12 +81,15 @@ const cargarLenguajes = async () => {
     
     const input = document.createElement('input');
     input.setAttribute('type', 'checkbox');
-    input.setAttribute('name', 'lenguajes[]');
+    input.setAttribute('name', 'lenguajes');
     input.setAttribute('id', 'leng__' + lenguaje.id);
     input.setAttribute('value', lenguaje.id);
     input.setAttribute('required', '');
     
     label.insertAdjacentElement('afterbegin', input);
+
+    input.addEventListener('change', validarCheckeo);
+
     contenedor.append(label);
   });
 }
@@ -150,16 +153,7 @@ documento.addEventListener('blur', validarCampo);
 usuario.addEventListener('blur', validarCampo);
 contrasena.addEventListener('blur', validarCampo);
 
-[...generos].forEach((campo) => {
-  campo.addEventListener('change', validarCheckeo);
-});
-
-[...lenguajes].forEach((campo) => {
-  campo.addEventListener('change', validarCheckeo);
-});
-
-
-formulario.addEventListener('submit', (event) => {
+formulario.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   if (validarCampos(event)) {
@@ -170,6 +164,21 @@ formulario.addEventListener('submit', (event) => {
     event.target.reset();
 
     boton.setAttribute('disabled', '');
+
+    const respuesta = await crear("usuarios", datos);    
+
+    if (!respuesta.ok) {
+      alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).error}`);
+      return;
+    }    
+
+    const usuarioCreado = (await respuesta.json()).usuarioCreado;
+
+    datos.lenguajes.forEach(async(lenguaje) =>{
+      console.log(lenguaje);
+      await crear("lenguajes_usuarios", { id_usuario: usuarioCreado.id, id_lenguaje: lenguaje });
+    });
+    location.reload();
   }
 });
 
@@ -190,13 +199,17 @@ addEventListener('DOMContentLoaded', async () => {
       tablaBody.append(fila);
 
       const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
-      usuario.telefono, usuario.ciudad, usuario.genero, usuario.no_documento, '', usuario.usuario];
+      usuario.telefono, usuario.ciudad, usuario.genero, usuario.documento, usuario.lenguajes.join(", ") , usuario.usuario];
 
       celdas.forEach((texto) => {
         const celda = document.createElement('td');
         celda.classList.add('tabla__celda');
         celda.textContent = texto;
         fila.append(celda);
+      });
+
+      fila.addEventListener('click', () => {
+        window.location.href = `usuarioGestion.html?id=${usuario.id}`;
       });
     });
   }

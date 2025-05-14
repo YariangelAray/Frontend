@@ -1,6 +1,6 @@
 //importaciones
 import { validarCampo, validarCampos, validarTexto, datos } from "../validaciones.js";
-import obtenerDatos from "../Helpers/realizarPeticion.js";
+import { obtenerDatos, crear } from "../Helpers/realizarPeticion.js";
 
 // variables
 const formulario = document.querySelector('form');
@@ -54,15 +54,21 @@ nombre.addEventListener('keydown', validarTexto);
 
 nombre.addEventListener('blur', validarCampo);
 
-formulario.addEventListener('submit', (event) => {
+formulario.addEventListener('submit', async(event) => {
   event.preventDefault();
   
   if (validarCampos(event)) {
-
-    console.log("Datos guardados:", datos);
-
+    
+    const respuesta = await crear("generos", datos);
+    
+    if (!respuesta.ok) {
+      alert(`Error al crear el género: \n❌ ${(await respuesta.json()).error}`);
+      return;
+    }
+    
     alert("Formulario enviado.");
     event.target.reset();
+    location.reload();    
   }
 });
 
@@ -90,6 +96,11 @@ addEventListener('DOMContentLoaded', async () => {
         celda.textContent = texto;
         fila.append(celda);
       });
+
+      fila.addEventListener('click', () => {
+        window.location.href = `generoGestion.html?id=${genero.id}`;
+      });
+
     });
   }
 });

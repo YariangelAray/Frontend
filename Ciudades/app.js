@@ -1,6 +1,6 @@
 //importaciones
 import { validarCampo, validarCampos, validarTexto, datos } from "../validaciones.js";
-import obtenerDatos from "../Helpers/realizarPeticion.js";
+import { obtenerDatos, crear } from "../Helpers/realizarPeticion.js";
 
 // variables
 const formulario = document.querySelector('form');
@@ -51,20 +51,26 @@ const crearTabla = () => {
 //eventos
 
 nombre.addEventListener('keydown', validarTexto);
-
 nombre.addEventListener('blur', validarCampo);
 
-formulario.addEventListener('submit', (event) => {
+formulario.addEventListener('submit', async (event) => {
   event.preventDefault();
   
   if (validarCampos(event)) {
 
-    console.log("Datos guardados:", datos);
-
+    const respuesta = await crear("ciudades", datos);
+    
+    if (!respuesta.ok) {
+      alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).error}`);
+      return;
+    }
+    
     alert("Formulario enviado.");
     event.target.reset();
+    location.reload();
   }
 });
+
 
 addEventListener('DOMContentLoaded', async () => {
   const ciudades = await obtenerDatos('ciudades');
@@ -89,6 +95,10 @@ addEventListener('DOMContentLoaded', async () => {
         celda.classList.add('tabla__celda');
         celda.textContent = texto;
         fila.append(celda);
+      });
+
+      fila.addEventListener('click', () => {
+        window.location.href = `ciudadGestion.html?id=${ciudad.id}`;
       });
     });
   }
