@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Usuarios</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <header class="header">
+    <nav class="nav">
+      <ul class="nav__list">
+        <li class="nav__item"><a href="Ciudad/ciudad.html">Ciudades</a></li>
+        <li class="nav__item "><a href="Genero/genero.html">Géneros</a></li>
+      </ul>
+
+      <h1 class="title center">Usuarios</h1>
+
+      <ul class="nav__list">
+        <li class="nav__item "><a href="Lenguaje/lenguaje.html">Lenguajes</a></li>
+        <li class="nav__item nav__item--active"><a href="">Usuarios</a></li>
+      </ul>
+    </nav>      
+  </header>
+
+    <main>
+      <section class="section">        
+        <div class="card">
+
+          <h2 class="center subtitle">Ingrese sus datos de usuario</h2>
+
+          <form action="#" novalidate class="form">
+
+            <div class="form__control">
+              <input type="text" name= "nombre" placeholder="Nombre" required class="input">
+            </div>
+            <div class="form__control">
+              <input type="text" name= "apellido"  placeholder="Apellido" required class="input">
+            </div>
+            <div class="form__control">
+              <input type="tel" name= "telefono" placeholder="Telefono" required class="input">
+            </div>
+            <div class="form__control">
+              <select name="id_ciudad" id="ciudad" required class="input">
+                <option value="">Seleccione una ciudad</option>
+                <!-- ... -->
+              </select>            
+            </div>
+            <div class="form__control">
+              <div class="form__generos">
+                <h4>Genero:</h4>
+                <!-- ... -->
+              </div>       
+            </div>              
+            <div class="form__control">
+              <input type="text" name= "documento" placeholder="Documento" required class="input">
+            </div>
+            <div class="form__control">
+              <div class="form__lenguajes" data-lenguajes= "3">
+                <h4>Lenguajes:</h4>
+                <!-- ... -->
+              </div>       
+            </div>
+            <div class="form__control">
+              <input type="text" name= "usuario" placeholder="Usuario"  required class="input">
+            </div>
+            <div class="form__control">
+              <input type="password" name= "contrasena"  placeholder="Contraseña" required class="input">
+            </div>
+
+            <div class="form__control">
+              <label for="politica" class="politica">
+                <input type="checkbox" name="politica" id="politica" class="politica__check input-checkbox"> Acepto términos y condiciones
+              </label>              
+            </div>
+
+            <button class="button" type="submit" id="btn_validar">Enviar</button>
+          </form>
+        </div>        
+      </section>
+    </main>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>

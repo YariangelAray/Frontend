@@ -1,10 +1,9 @@
-export const obtenerDatos = async (endpoint)=> {
+export const get = async (endpoint)=> {
     const data = await fetch('http://localhost:3000/' + endpoint);
     return await data.json();
 }
 
-
-export const crear = async (endpoint, objeto) => {
+export const post = async (endpoint, objeto) => {
     return await fetch('http://localhost:3000/' + endpoint, {
         method: 'POST',
         headers: {
@@ -14,8 +13,7 @@ export const crear = async (endpoint, objeto) => {
     });
 }
 
-export const actualizar = async (endpoint, objeto) => {
-    
+export const put = async (endpoint, objeto) => {
     return await fetch('http://localhost:3000/' + endpoint, {
         method: 'PUT',
         headers: {
@@ -25,7 +23,7 @@ export const actualizar = async (endpoint, objeto) => {
     });
 }
 
-export const eliminar = async (endpoint) => {
+export const del = async (endpoint) => {
     return await fetch('http://localhost:3000/' + endpoint, {
         method: 'DELETE',
         headers: {

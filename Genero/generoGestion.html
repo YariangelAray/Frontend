@@ -3,23 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lenguajes</title>
+  <title>Género</title>
   <link rel="stylesheet" href="../style.css">
 </head>
-
 <body>
 
   <header class="header">
     <nav class="nav">
       <ul class="nav__list">
         <li class="nav__item"><a href="../Ciudad/ciudad.html">Ciudades</a></li>
-        <li class="nav__item"><a href="../Genero/genero.html">Géneros</a></li>
+        <li class="nav__item "><a href="../Genero/genero.html">Géneros</a></li>
       </ul>
 
-      <h1 class="title">Lenguajes</h1>
+      <h1 class="title">Género</h1>
 
       <ul class="nav__list">
-        <li class="nav__item  nav__item--active"><a href="">Lenguajes</a></li>
+        <li class="nav__item "><a href="../Lenguaje/lenguaje.html">Lenguajes</a></li>
         <li class="nav__item "><a href="../index.html">Usuarios</a></li>
       </ul>
     </nav>      
@@ -29,19 +28,21 @@
 
     <section class="section">
       <div class="card">
-        <h2 class="center subtitle">Ingrese los datos del lenguaje</h2>
+        <h2 class="center subtitle">Ingrese los datos del género</h2>
 
         <form action="#" novalidate class="form">          
           <div class="form__control">
-            <input class="input" type="text" name= "nombre" placeholder="Lenguaje" required>          
+            <input class="input" type="text" name= "nombre" placeholder="Género" required>          
           </div>
-          <button class="button" type="submit" id="btn_validar">Enviar</button>
+          <button class="button" type="submit" id="btn_actualizar">Actualizar</button>
+          <button class="button" type="button" id="btn_eliminar">Eliminar</button>
         </form>
       </div>
     </section>
-
+    
   </main>
 
-  <script src="../JS/Lenguaje/app.js" type="module"></script>
+  <script src="../JS/Genero/gestion.js" type="module"></script>
+
 </body>
 </html>

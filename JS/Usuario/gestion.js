@@ -1,14 +1,17 @@
 //importaciones
 import { validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "../validaciones.js";
-import { obtenerDatos, crear, actualizar, eliminar } from "../Helpers/realizarPeticion.js";
+import { get, post, put, del } from "../api.js";
 
 // variables
 const formulario = document.querySelector('form');
 const btnEliminar = document.querySelector('#btn_eliminar');
 
+// Obtenemos el id del usuario desde la URL
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get('id');
-const usuarioObtenido = await obtenerDatos(`usuarios/${id}`);
+
+// Obtenemos los datos del usuario desde el servidor realizando una petición GET
+const usuarioObtenido = await get(`usuarios/${id}`);
 
 const tituloPagina = document.querySelector('title');
 const titulo = document.querySelector('h1');
@@ -24,7 +27,7 @@ const ciudadSelect = document.querySelector('[name="id_ciudad"]');
 //funciones
 
 const cargarGeneros = async () => {
-  const generos = await obtenerDatos('generos');
+  const generos = await get('generos');
   
   const contenedor = document.querySelector('.form__generos');
 
@@ -40,10 +43,12 @@ const cargarGeneros = async () => {
     input.setAttribute('value', genero.id);
     input.setAttribute('id', 'gen__' + genero.id);
     input.setAttribute('required', '');
+    input.setAttribute('class','input-radio');
     
     label.insertAdjacentElement('afterbegin', input);
     contenedor.append(label);
 
+    // Validamos si el género del usuario coincide con el género del formulario y lo seleccionamos
     if (usuarioObtenido.genero === label.textContent) input.checked = true;
 
     input.addEventListener('change', validarCheckeo);
@@ -52,7 +57,7 @@ const cargarGeneros = async () => {
 }
 
 const cargarCiudades = async () =>{
-  const ciudades = await obtenerDatos('ciudades');
+  const ciudades = await get('ciudades');
   
   const contenedor = document.querySelector('.form__control select');
 
@@ -62,13 +67,14 @@ const cargarCiudades = async () =>{
     option.setAttribute('value', ciudad.id);
     contenedor.append(option);
 
+    // Validamos si la ciudad del usuario coincide con la ciudad del formulario y la seleccionamos
     if (usuarioObtenido.ciudad == option.textContent) ciudadSelect.value = option.value;
 
   });  
 }
 
 const cargarLenguajes = async () => {
-  const lenguajes = await obtenerDatos('lenguajes');
+  const lenguajes = await get('lenguajes');
   
   const contenedor = document.querySelector('.form__lenguajes');
 
@@ -84,17 +90,20 @@ const cargarLenguajes = async () => {
     input.setAttribute('id', 'leng__' + lenguaje.id);
     input.setAttribute('value', lenguaje.id);
     input.setAttribute('required', '');
+    input.setAttribute('class', 'input-checkbox')
     
     label.insertAdjacentElement('afterbegin', input);
 
     input.addEventListener('change', validarCheckeo);
 
+    // Validamos si el lenguaje que fue agregado al formulario está en la lista de lenguajes del usuario y lo seleccionamos
     if (usuarioObtenido.lenguajes.includes(label.textContent)) input.checked = true;
 
     contenedor.append(label);
   });
 }
 
+// Función para asignar los valores del usuario al formulario
 const asignarValores = async () => {
   tituloPagina.textContent = usuarioObtenido.nombre + " " + usuarioObtenido.apellido;
   titulo.textContent = usuarioObtenido.nombre + " " + usuarioObtenido.apellido;
@@ -107,6 +116,7 @@ const asignarValores = async () => {
   contrasena.value = usuarioObtenido.contrasena;
 }
 
+// Ejecutamos las funciones para cargar los datos al formulario
 await cargarCiudades();
 await cargarGeneros();
 await cargarLenguajes();
@@ -131,38 +141,47 @@ formulario.addEventListener('submit', async (event) => {
 
   event.preventDefault();
 
+  // Validamos que todos los campos actualizados esten completos
   if (!validarCampos(event)) return;
     
-  const respuesta = await actualizar(`usuarios/${id}`, datos);
-  console.log(await respuesta.json());
+  // Hacemos la petición PUT al servidor para actualizar el usuario
+  const respuesta = await put(`usuarios/${id}`, datos);
   
+  // Si la respuesta no es correcta, mostramos un mensaje de error  
   if (!respuesta.ok) {
     alert(`Error al actualizar el usuario: \n❌ ${(await respuesta.json()).error}`);
     return;
   }
 
-  await eliminar(`lenguajes_usuarios/usuario/${id}`);
+  // Eliminamos los lenguajes del usuario para volver a crear la relación entre el usuario y los lenguajes
+  await del(`lenguajes_usuarios/usuario/${id}`);
 
-
+  // Recorremos los lenguajes seleccionados y creamos una relación entre el usuario y los lenguajes
   for (const id_lenguaje of datos.lenguajes) {
-    await crear("lenguajes_usuarios", {id_usuario: id, id_lenguaje: id_lenguaje});
+    await post("lenguajes_usuarios", {id_usuario: id, id_lenguaje: id_lenguaje});
   }  
   
   alert("Usuario actualizado.");
 
-  location.reload();
+  location.reload(); // Recargamos la página para mostrar los nuevos datos del usuario en el formulario
 });
 
+// Le agregamos el evento de eliminar al botón de eliminar
 btnEliminar.addEventListener('click', async () => {
+  // Hacemos una consulta de confirmación antes de eliminar el usuario
   if (!confirm("¿Está seguro de que desea eliminar este usuario?")) return;
 
-  await eliminar(`lenguajes_usuarios/usuario/${id}`);
+  // Primero eliminamos la relación entre el usuario y los lenguajes
+  await del(`lenguajes_usuarios/usuario/${id}`);
 
-  const respuesta = await eliminar(`usuarios/${id}`);
+  // Luego eliminamos el usuario
+  // Hacemos la petición DELETE al servidor para eliminar el usuario
+  const respuesta = await del(`usuarios/${id}`);
+  // Si la respuesta no es correcta, mostramos un mensaje de error
   if (!respuesta.ok) {
     alert("❌ Error al eliminar usuario." );
     return;
   }
   alert("Usuario eliminado.");
-  window.location.href = "index.html";
+  window.location.href = "../../index.html"; // Redirigimos al usuario a la página de inicio ya que el usuario fue eliminado
 });
