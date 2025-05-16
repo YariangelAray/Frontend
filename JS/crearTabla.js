@@ -39,12 +39,14 @@ export const crearTabla = (tituloTexto, encabezados, datos) => {
 
   // Recorremos la lista de los datos y creamos una fila por cada dato
   datos.forEach((dato) => {
+    const { celdas, redireccion} = dato;
+
     const fila = document.createElement('tr');
     fila.classList.add('tabla__fila');
     tablaBody.append(fila);
 
     // Recorremos las celdas y las agregamos a la fila
-    dato.celdas.forEach((texto) => {
+    celdas.forEach((texto) => {
       const celda = document.createElement('td');
       celda.classList.add('tabla__celda');
       celda.textContent = texto;
@@ -53,7 +55,7 @@ export const crearTabla = (tituloTexto, encabezados, datos) => {
 
     // Agregamos un evento de clic a la fila para redirigir el registro a la página de gestión
     fila.addEventListener('click', () => {
-      window.location.href = dato.redireccion;
+      window.location.href = redireccion;
     });
   });
 
