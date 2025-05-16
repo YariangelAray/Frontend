@@ -121,7 +121,8 @@ export const validarCampos = (event) => {
   // Recorremos los campos y validamos cada uno de ellos
   campos.forEach((campo) => {
 
-    valido = validarCampo({target: campo}); // Validamos el campo
+    if (!validarCampo({ target: campo })) valido = false;    
+    
     datos[campo.getAttribute('name')] = campo.value;
   });
 
