@@ -1,6 +1,7 @@
 //importaciones
 import { validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "./JS/validaciones.js";
 import { get, post } from "./JS/api.js";
+import crearTabla from "./JS/crearTabla.js";
 
 // variables
 const formulario = document.querySelector('form');
@@ -100,43 +101,23 @@ const cargarLenguajes = async () => {
   });
 }
 
-// Función para crear una tabla
-const crearTabla = () => {
-  const main = document.querySelector('main');
-
-  const tabla = document.createElement('table');
-  tabla.classList.add('tabla');
-
-  const tablaHeader = document.createElement('thead');
-  tablaHeader.classList.add('tabla__encabezado');
-  tabla.append(tablaHeader);
-
-  const tablaFila = document.createElement('tr');
-  tablaFila.classList.add('tabla__fila');
-  tablaHeader.append(tablaFila);
-
+// Función para crear la tabla de usuarios
+const crearTablaUsuarios = (usuarios) => {
   const encabezados = [
     "ID", "Nombre Completo", "Teléfono", "Ciudad",
     "Género", "N° Documento", "Usuario", "Lenguajes"
   ];
-
-  encabezados.forEach((texto) => {
-    const th = document.createElement('th');
-    th.classList.add('tabla__celda', 'tabla__celda--encabezado');
-    th.textContent = texto;
-    tablaFila.append(th);
-  });
-
-  const segundaSeccion = document.createElement('section');
-  segundaSeccion.classList.add('section');
-
-  const titulo = document.createElement('h2');
-  titulo.textContent = "Lista de usuarios";
-  titulo.classList.add('center', 'subtitle');
-
-  segundaSeccion.append(titulo, tabla);
   
-  main.append(segundaSeccion);
+  const usuariosDatos = [];
+
+  usuarios.forEach((usuario) => {
+    const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
+      usuario.telefono, usuario.ciudad, usuario.genero, usuario.documento, usuario.usuario, usuario.lenguajes.join(", ") ];
+      
+    usuariosDatos.push({ celdas, redireccion: `Usuario/usuarioGestion.html?id=${usuario.id}`});
+  });
+    
+  crearTabla("Usuarios", encabezados, usuariosDatos);
 }
 
 //eventos
@@ -203,34 +184,6 @@ addEventListener('DOMContentLoaded', async () => {
   const usuarios = await get('usuarios');
 
   if (usuarios.length === 0) return;
-  
-  crearTabla();
-  // Creamos el cuerpo de la tabla 
-  const tabla = document.querySelector('.tabla');
-  const tablaBody = document.createElement('tbody');
-  tablaBody.classList.add('tabla__cuerpo');
-  tabla.append(tablaBody);
 
-  // Recorremos la lista de usuarios y creamos una fila por cada usuario
-  usuarios.forEach((usuario) => {
-    const fila = document.createElement('tr');
-    fila.classList.add('tabla__fila');
-    tablaBody.append(fila);
-
-    const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
-    usuario.telefono, usuario.ciudad, usuario.genero, usuario.documento, usuario.usuario, usuario.lenguajes.join(", ") ];
-
-    celdas.forEach((texto) => {
-      const celda = document.createElement('td');
-      celda.classList.add('tabla__celda');
-      celda.textContent = texto;
-      fila.append(celda);
-    });
-
-    // Agregamos un evento de clic a la fila para redirigir al usuario a la página de gestión
-    fila.addEventListener('click', () => {
-      window.location.href = `Usuario/usuarioGestion.html?id=${usuario.id}`;
-    });
-  });
-  
+  crearTablaUsuarios(usuarios);
 });
