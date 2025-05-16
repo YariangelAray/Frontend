@@ -27,7 +27,6 @@
   --espaciado: 10px;
   --espaciado-medio: 15px;
   --espaciado-grande: 20px;
-  --margen-auto: 0 auto;
 
   /* ----- BORDES Y RADIOS ----- */
   --radio-borde: 10px;  
@@ -69,7 +68,7 @@ a {
   height: auto;
   max-width: max-content;
   min-width: max-content;
-  margin: var(--margen-auto);  
+  margin: 0 auto;  
   color: var(--color-texto);
   border-bottom: solid 4px var(--color-secundario);
   margin-bottom: var(--espaciado);
@@ -285,7 +284,7 @@ a {
   background-color: var(--color-blanco);
   box-shadow: var(--sombra-media);
   border-radius: var(--radio-card);
-  margin: var(--margen-auto);
+  margin: var(--espaciado) auto;
   overflow: hidden;
 }
 
