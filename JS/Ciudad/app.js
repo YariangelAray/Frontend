@@ -41,7 +41,7 @@ formulario.addEventListener('submit', async (event) => {
   
   // Si la respuesta no es ok, mostramos un mensaje de error
   if (!respuesta.ok) {
-    alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).error}`);
+    alert(`Error al crear la ciudad: \n❌ ${(await respuesta.json()).message}`);
     return;
   }  
   
@@ -55,7 +55,7 @@ addEventListener('DOMContentLoaded', async () => {
   // Obtenemos la lista de ciudades haciendo una petición GET al servidor
   const ciudades = await get('ciudades');
 
-  if (ciudades.length == 0) return;
+  if (ciudades.data.length == 0) return;
   
-  crearTablaCiudades(ciudades);
+  crearTablaCiudades(ciudades.data);
 });

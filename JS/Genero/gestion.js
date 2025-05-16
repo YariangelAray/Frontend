@@ -5,7 +5,7 @@ import { get, put, del } from "../api.js";
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get('id');
 // Obtenemos los datos del género haciendo una petición GET al servidor
-const genero = await get(`generos/${id}`);
+const genero = (await get(`generos/${id}`)).data;
 
 const tituloPagina = document.querySelector('title');
 const titulo = document.querySelector('h1');
@@ -43,7 +43,7 @@ formulario.addEventListener('submit', async (event) => {
 
   // Si la respuesta no es ok, mostramos un mensaje de error
   if (!respuesta.ok) {        
-    alert(`Error al actualizar el género: \n❌ ${(await respuesta.json()).error}`);
+    alert(`Error al actualizar el género: \n❌ ${(await respuesta.json()).message}`);
     return;
   }
   alert("Género actualizado.");
@@ -62,7 +62,7 @@ btnEliminar.addEventListener('click', async () => {
 
   // Si la respuesta no es ok, mostramos un mensaje de error
   if (!respuesta.ok) {            
-    alert(`Error al eliminar el género: \n❌ ${(await respuesta.json()).error}`);            
+    alert(`Error al eliminar el género: \n❌ ${(await respuesta.json()).message}`);            
     return;
   }
   alert("Género eliminado.");

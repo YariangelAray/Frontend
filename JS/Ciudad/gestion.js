@@ -5,7 +5,7 @@ import { get, put, del } from "../api.js";
 const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get('id');
 // Obtenemos los datos de la ciudad haciendo una petición GET al servidor
-const ciudad = await get(`ciudades/${id}`);
+const ciudad = (await get(`ciudades/${id}`)).data;
 
 const tituloPagina = document.querySelector('title');
 const titulo = document.querySelector('h1');
@@ -43,7 +43,7 @@ formulario.addEventListener('submit', async (event) => {
 
   // Si la respuesta no es ok, mostramos un mensaje de error
   if (!respuesta.ok) {        
-    alert(`Error al actualizar la ciudad: \n❌ ${(await respuesta.json()).error}`);
+    alert(`Error al actualizar la ciudad: \n❌ ${(await respuesta.json()).message}`);
     return;
   }
   alert("Ciudad actualizada.");
@@ -61,8 +61,8 @@ btnEliminar.addEventListener('click', async () => {
   const respuesta = await del(`ciudades/${id}`);    
 
   // Si la respuesta no es ok, mostramos un mensaje de error
-  if (!respuesta.ok) {            
-    alert(`Error al eliminar la ciudad: \n❌ ${(await respuesta.json()).error}`);            
+  if (!respuesta.ok) {
+    alert(`Error al eliminar la ciudad: \n❌ ${(await respuesta.json()).message}`);            
     return;
   }
   alert("Ciudad eliminada.");

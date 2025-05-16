@@ -41,7 +41,7 @@ formulario.addEventListener('submit', async (event) => {
   
   // Si la respuesta no es ok, mostramos un mensaje de error
   if (!respuesta.ok) {
-    alert(`Error al crear el lenguaje: \n❌ ${(await respuesta.json()).error}`);
+    alert(`Error al crear el lenguaje: \n❌ ${(await respuesta.json()).message}`);
     return;
   }  
   
@@ -55,7 +55,7 @@ addEventListener('DOMContentLoaded', async () => {
   // Obtenemos la lista de lenguajes haciendo una petición GET al servidor
   const lenguajes = await get('lenguajes');
 
-  if (lenguajes.length == 0) return;
+  if (lenguajes.data.length == 0) return;
   
-  crearTablaLenguajes(lenguajes);
+  crearTablaLenguajes(lenguajes.data);
 });

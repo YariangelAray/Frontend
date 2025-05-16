@@ -41,7 +41,7 @@ formulario.addEventListener('submit', async (event) => {
   
   // Si la respuesta no es ok, mostramos un mensaje de error
   if (!respuesta.ok) {
-    alert(`Error al crear el género: \n❌ ${(await respuesta.json()).error}`);
+    alert(`Error al crear el género: \n❌ ${(await respuesta.json()).message}`);
     return;
   }  
   
@@ -55,8 +55,8 @@ addEventListener('DOMContentLoaded', async () => {
   // Obtenemos la lista de géneros haciendo una petición GET al servidor
   const generos = await get('generos');
 
-  if (generos.length == 0) return;
+  if (generos.data.length == 0) return;
   
-  crearTablaGeneros(generos);
+  crearTablaGeneros(generos.data);
   
 });

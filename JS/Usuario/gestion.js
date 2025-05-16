@@ -11,7 +11,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const id = urlParams.get('id');
 
 // Obtenemos los datos del usuario desde el servidor realizando una petición GET
-const usuarioObtenido = await get(`usuarios/${id}`);
+const usuarioObtenido = (await get(`usuarios/${id}`)).data;
 
 const tituloPagina = document.querySelector('title');
 const titulo = document.querySelector('h1');
@@ -22,7 +22,7 @@ const telefono = document.querySelector('[name="telefono"]');
 const documento = document.querySelector('[name="documento"]');
 const usuario = document.querySelector('[name="usuario"]');
 const contrasena = document.querySelector('[name="contrasena"]');
-const ciudadSelect = document.querySelector('[name="id_ciudad"]');
+const ciudadSelect = document.querySelector('[name="ciudad_id"]');
 
 //funciones
 
@@ -31,7 +31,7 @@ const cargarGeneros = async () => {
   
   const contenedor = document.querySelector('.form__generos');
 
-  generos.forEach((genero) => {
+  generos.data.forEach((genero) => {
     const label = document.createElement('label');
     label.textContent = genero.nombre;  
     label.setAttribute('for', 'gen__' + genero.id);
@@ -39,7 +39,7 @@ const cargarGeneros = async () => {
     
     const input = document.createElement('input');
     input.setAttribute('type', 'radio');
-    input.setAttribute('name', 'id_genero');
+    input.setAttribute('name', 'genero_id');
     input.setAttribute('value', genero.id);
     input.setAttribute('id', 'gen__' + genero.id);
     input.setAttribute('required', '');
@@ -49,7 +49,9 @@ const cargarGeneros = async () => {
     contenedor.append(label);
 
     // Validamos si el género del usuario coincide con el género del formulario y lo seleccionamos
-    if (usuarioObtenido.genero === label.textContent) input.checked = true;
+    console.log(input,usuarioObtenido);
+    
+    if (usuarioObtenido.genero_id == input.value) input.checked = true;
 
     input.addEventListener('change', validarCheckeo);
   });
@@ -61,14 +63,14 @@ const cargarCiudades = async () =>{
   
   const contenedor = document.querySelector('.form__control select');
 
-  ciudades.forEach((ciudad) => {
+  ciudades.data.forEach((ciudad) => {
     const option = document.createElement('option');
     option.textContent = ciudad.nombre;
     option.setAttribute('value', ciudad.id);
     contenedor.append(option);
-
+    
     // Validamos si la ciudad del usuario coincide con la ciudad del formulario y la seleccionamos
-    if (usuarioObtenido.ciudad == option.textContent) ciudadSelect.value = option.value;
+    if (usuarioObtenido.ciudad_id == option.value) ciudadSelect.value = option.value;
 
   });  
 }
@@ -78,7 +80,7 @@ const cargarLenguajes = async () => {
   
   const contenedor = document.querySelector('.form__lenguajes');
 
-  lenguajes.forEach((lenguaje) => {
+  lenguajes.data.forEach((lenguaje) => {
     const label = document.createElement('label');
     label.textContent = lenguaje.nombre;  
     label.setAttribute('for', 'leng__' + lenguaje.id);
@@ -97,7 +99,7 @@ const cargarLenguajes = async () => {
     input.addEventListener('change', validarCheckeo);
 
     // Validamos si el lenguaje que fue agregado al formulario está en la lista de lenguajes del usuario y lo seleccionamos
-    if (usuarioObtenido.lenguajes.includes(label.textContent)) input.checked = true;
+    if (usuarioObtenido.lenguajes.includes(input.value)) input.checked = true;
 
     contenedor.append(label);
   });
@@ -148,8 +150,8 @@ formulario.addEventListener('submit', async (event) => {
   const respuesta = await put(`usuarios/${id}`, datos);
   
   // Si la respuesta no es correcta, mostramos un mensaje de error  
-  if (!respuesta.ok) {
-    alert(`Error al actualizar el usuario: \n❌ ${(await respuesta.json()).error}`);
+  if (!respuesta.ok) {    
+    alert(`Error al actualizar el usuario: \n❌ ${(await respuesta.json()).message}`);
     return;
   }
 
@@ -157,8 +159,8 @@ formulario.addEventListener('submit', async (event) => {
   await del(`lenguajes_usuarios/usuario/${id}`);
 
   // Recorremos los lenguajes seleccionados y creamos una relación entre el usuario y los lenguajes
-  for (const id_lenguaje of datos.lenguajes) {
-    await post("lenguajes_usuarios", {id_usuario: id, id_lenguaje: id_lenguaje});
+  for (const lenguaje_id of datos.lenguajes) {
+    await post("lenguajes_usuarios", {usuario_id: id, lenguaje_id: lenguaje_id});
   }  
   
   alert("Usuario actualizado.");

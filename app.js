@@ -14,7 +14,7 @@ const telefono = document.querySelector('[name="telefono"]');
 const documento = document.querySelector('[name="documento"]');
 const usuario = document.querySelector('[name="usuario"]');
 const contrasena = document.querySelector('[name="contrasena"]');
-const ciudad = document.querySelector('[name="id_ciudad"]');
+const ciudad = document.querySelector('[name="ciudad_id"]');
 
 const checkBox = document.querySelector('[name="politica"]');
 
@@ -33,7 +33,7 @@ const cargarGeneros = async () => {
   
   const contenedor = document.querySelector('.form__generos');
 
-  generos.forEach((genero) => {
+  generos.data.forEach((genero) => {
     const label = document.createElement('label');
     label.textContent = genero.nombre;  
     label.setAttribute('for', 'gen__' + genero.id);
@@ -41,7 +41,7 @@ const cargarGeneros = async () => {
     
     const input = document.createElement('input');
     input.setAttribute('type', 'radio');
-    input.setAttribute('name', 'id_genero');
+    input.setAttribute('name', 'genero_id');
     input.setAttribute('value', genero.id);
     input.setAttribute('id', 'gen__' + genero.id);
     input.setAttribute('required', '');
@@ -63,7 +63,7 @@ const cargarCiudades = async () =>{
 
   const contenedor = document.querySelector('.form__control select');
 
-  ciudades.forEach((ciudad) => {
+  ciudades.data.forEach((ciudad) => {
     const option = document.createElement('option');
     option.textContent = ciudad.nombre;
     option.setAttribute('value', ciudad.id);
@@ -78,7 +78,7 @@ const cargarLenguajes = async () => {
   
   const contenedor = document.querySelector('.form__lenguajes');
 
-  lenguajes.forEach((lenguaje) => {
+  lenguajes.data.forEach((lenguaje) => {
     const label = document.createElement('label');
     label.textContent = lenguaje.nombre;  
     label.setAttribute('for', 'leng__' + lenguaje.id);
@@ -102,7 +102,7 @@ const cargarLenguajes = async () => {
 }
 
 // Función para crear la tabla de usuarios
-const crearTablaUsuarios = (usuarios) => {
+const crearTablaUsuarios = async (usuarios) => {
   const encabezados = [
     "ID", "Nombre Completo", "Teléfono", "Ciudad",
     "Género", "N° Documento", "Usuario", "Lenguajes"
@@ -110,13 +110,16 @@ const crearTablaUsuarios = (usuarios) => {
   
   const usuariosDatos = [];
 
-  usuarios.forEach((usuario) => {
+  for (const usuario of usuarios) {
+    const lenguajes = usuario.lenguaje ? usuario.lenguajes : [];
+    const genero = (await get("generos/" + usuario.genero_id)).data;
+    const ciudad = (await get("ciudades/" + usuario.ciudad_id)).data;      
+
     const celdas = [usuario.id, `${usuario.nombre} ${usuario.apellido}`,
-      usuario.telefono, usuario.ciudad, usuario.genero, usuario.documento, usuario.usuario, usuario.lenguajes.join(", ") ];
+      usuario.telefono, ciudad.nombre, genero.nombre, usuario.documento, usuario.usuario, lenguajes.join(", ")];
       
     usuariosDatos.push({ celdas, redireccion: `Usuario/usuarioGestion.html?id=${usuario.id}`});
-  });
-    
+  }
   crearTabla("Usuarios", encabezados, usuariosDatos);
 }
 
@@ -149,11 +152,16 @@ formulario.addEventListener('submit', async (event) => {
   if (!validarCampos(event)) return;
   
   // Realizamos una petición POST al servidor para crear el usuario
-  const respuesta = await post("usuarios", datos);    
+  const datosCambiados = { ...datos };
+  delete datosCambiados.lenguajes;
+
+  const respuesta = await post("usuarios", datosCambiados);
+  console.log(datos);
   
   // Si la respuesta no es ok, mostramos un mensaje de error
-  if (!respuesta.ok) {
-    alert(`Error al crear el usuario \n❌ ${(await respuesta.json()).error}`);
+  if (!respuesta.ok) {    
+    
+    alert(`Error al crear el usuario \n❌ ${(await respuesta.json()).message}`);
     return;
   }    
   
@@ -163,7 +171,7 @@ formulario.addEventListener('submit', async (event) => {
   // Recorremos los lenguajes seleccionados y creamos una relación entre el usuario y los lenguajes
   datos.lenguajes.forEach(async(lenguaje) =>{      
     // Realizamos una petición POST al servidor para crear la relación entre el usuario y los lenguajes
-    await post("lenguajes_usuarios", { id_usuario: usuarioCreado.id, id_lenguaje: lenguaje });
+    await post("lenguajes_usuarios", { id_usuario: usuarioCreado.id, lenguaje_id: lenguaje });
   });
 
   alert("Formulario enviado.");
@@ -183,7 +191,7 @@ addEventListener('DOMContentLoaded', async () => {
   // Obtenemos la lista de usuarios desde el servidor para mostrarla en la tabla
   const usuarios = await get('usuarios');
 
-  if (usuarios.length === 0) return;
+  if (usuarios.data.length === 0) return;
 
-  crearTablaUsuarios(usuarios);
+  crearTablaUsuarios(usuarios.data);
 });

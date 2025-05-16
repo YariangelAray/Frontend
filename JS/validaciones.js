@@ -3,7 +3,7 @@
 export const validarTexto = (event) => {
   const key = event.key; // Obtenemos la tecla presionada
   const regex = /^[\D]*$/i;  // Expresión regular para letras y caracteres especiales
-  if (!regex.test(key) || event.target.value.length > 40) { // Validamos si la tecla no es una letra o si el campo supera los 40 caracteres
+  if (!regex.test(key) || event.target.value.length > 50) { // Validamos si la tecla no es una letra o si el campo supera los 40 caracteres
     event.preventDefault(); // Evitamos la acción de la tecla
   }
 }
@@ -15,7 +15,7 @@ export const validarNumero = (event) => {
   const teclasEspeciales = ["Backspace", "Tab", "Enter", "ArrowLeft", "ArrowRight", "Delete"]; // Teclas especiales que se permiten
 
   // Validamos si la tecla no es un número o si el campo supera los 15 caracteres o si es una tecla especial
-  if (!regex.test(key) && !teclasEspeciales.includes(key) || event.target.value.length > 15) {
+  if (!regex.test(key) && !teclasEspeciales.includes(key) || event.target.value.length > 10) {
     event.preventDefault(); // Evitamos la acción de la tecla
   }
 }
