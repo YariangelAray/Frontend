@@ -15,7 +15,7 @@ export const validarNumero = (event) => {
   const teclasEspeciales = ["Backspace", "Tab", "Enter", "ArrowLeft", "ArrowRight", "Delete"]; // Teclas especiales que se permiten
 
   // Validamos si la tecla no es un número o si el campo supera los 15 caracteres o si es una tecla especial
-  if (!regex.test(key) && !teclasEspeciales.includes(key) || event.target.value.length > 10) {
+  if ((!regex.test(key) || event.target.value.length >= 10) && !teclasEspeciales.includes(key)) {
     event.preventDefault(); // Evitamos la acción de la tecla
   }
 }
@@ -162,8 +162,7 @@ export const validarCampos = (event) => {
   
   // Validamos si la contraseña es válida
   if (contrasena && contrasena.value.trim() != "" && !regexContra.test(contrasena.value)) {
-    agregarError(contrasena, "La contraseña es inválida."); // Agregamos el error
-    alert("La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un caracter especial");
+    agregarError(contrasena, "La contraseña debe contener al menos 8 caracteres, una mayúscula, un número y un caracter especial."); // Agregamos el error    
     valido = false; // Si la contraseña es inválida, el formulario no es válido
   }
 

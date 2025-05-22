@@ -123,6 +123,29 @@ const crearTablaUsuarios = async (usuarios) => {
   crearTabla("Usuarios", encabezados, usuariosDatos);
 }
 
+
+
+// Esta función recibe la respuesta del servidor con errores y los muestra de forma clara
+function manejarErroresDeServidor(mensaje) {
+  // Verificamos si hay un arreglo de errores
+  if (Array.isArray(mensaje.errors) && mensaje.errors.length > 0) {
+    // Recorremos cada error y extraemos el mensaje correspondiente
+    const errores = mensaje.errors.map(error => {
+      // Intentamos usar message, msg, o convertir el objeto completo a texto si no hay mensaje
+      return `❌ ${error.message}`;
+    });
+
+    // Mostramos todos los errores en un solo alert
+    alert(`Errores al crear el usuario:\n${errores.join('\n')}`);
+
+  } else alert(`❌ Error al crear el usuario: ${mensaje.message || "Error desconocido."}`);
+
+  // Mostramos la respuesta completa en la consola
+  console.warn("Respuesta del servidor con error:", mensaje);
+}
+
+
+
 //eventos
 
 // Se agrega el evento de habilitar el botón de enviar formulario al checkbox
@@ -146,40 +169,49 @@ contrasena.addEventListener('blur', validarCampo);
 
 // Se agrega el evento de validación al botón de enviar formulario
 formulario.addEventListener('submit', async (event) => {
-  event.preventDefault();
+  event.preventDefault(); // Evitamos que el formulario recargue la página automáticamente
 
-  // Validamos los campos del formulario
+  // Validamos los campos del formulario. Si no son válidos, detenemos el proceso
   if (!validarCampos(event)) return;
-  
-  // Realizamos una petición POST al servidor para crear el usuario
+
+  // Copiamos los datos del formulario, excluyendo los lenguajes (que se manejan aparte)
   const datosCambiados = { ...datos };
   delete datosCambiados.lenguajes;
 
-  const respuesta = await post("usuarios", datosCambiados);
-  console.log(datos);
-  
-  // Si la respuesta no es ok, mostramos un mensaje de error
-  if (!respuesta.ok) {    
-    
-    alert(`Error al crear el usuario \n❌ ${(await respuesta.json()).message}`);
-    return;
-  }    
-  
-  // Guardamos el objeto del usuario creado en una variable
-  const usuarioCreado = (await respuesta.json()).usuarioCreado;
-  
-  // Recorremos los lenguajes seleccionados y creamos una relación entre el usuario y los lenguajes
-  datos.lenguajes.forEach(async(lenguaje) =>{      
-    // Realizamos una petición POST al servidor para crear la relación entre el usuario y los lenguajes
-    await post("lenguajes_usuarios", { id_usuario: usuarioCreado.id, lenguaje_id: lenguaje });
-  });
+  try {
+    // Realizamos una petición POST al servidor para crear el usuario
+    const respuesta = await post("usuarios", datosCambiados);
 
-  alert("Formulario enviado.");
-  event.target.reset();
+    // Convertimos la respuesta a formato JSON
+    const resultado = await respuesta.json();
 
-  boton.setAttribute('disabled', '');
-  location.reload(); // Recargamos la página para mostrar el nuevo usuario en la tabla
+    // Si la respuesta NO fue exitosa (por ejemplo, error 400 o 500), mostramos los errores
+    if (!respuesta.ok) {
+      manejarErroresDeServidor(resultado); // Usamos una función externa para mostrar bien los errores
+      return; // Detenemos el flujo si hay errores
+    }
+
+    // Extraemos el usuario que se creó correctamente del objeto de respuesta
+    const usuarioCreado = resultado.usuarioCreado;
+
+    // Recorremos los lenguajes seleccionados por el usuario
+    for (const lenguaje of datos.lenguajes) {
+      // Por cada lenguaje, enviamos una petición POST para crear la relación usuario-lenguaje
+      await post("lenguajes_usuarios", {id_usuario: usuarioCreado.id, lenguaje_id: lenguaje,});
+    }
+
+    alert("Formulario enviado.");    
+    event.target.reset();    
+    boton.setAttribute('disabled', '');    
+    location.reload();
+
+  } catch (error) {
+    // Capturamos errores inesperados como problemas de conexión o errores en el código
+    alert(`❌ Error inesperado: ${error.message}`);
+    console.error("Error interno:", error);
+  }
 });
+
 
 addEventListener('DOMContentLoaded', async () => {
 
@@ -191,7 +223,7 @@ addEventListener('DOMContentLoaded', async () => {
   // Obtenemos la lista de usuarios desde el servidor para mostrarla en la tabla
   const usuarios = await get('usuarios');
 
-  if (usuarios.data.length === 0) return;
+  if (usuarios.message || usuarios.data.length === 0) return;
 
   crearTablaUsuarios(usuarios.data);
 });
