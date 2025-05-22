@@ -111,7 +111,12 @@ const crearTablaUsuarios = async (usuarios) => {
   const usuariosDatos = [];
 
   for (const usuario of usuarios) {
-    const lenguajes = usuario.lenguaje ? usuario.lenguajes : [];
+    
+    const lenguajes = usuario.lenguajes ? await Promise.all(usuario.lenguajes.map(async (l) => {
+      const lenguaje = (await get("lenguajes/" + l)).data;
+      return lenguaje.nombre;
+    })) : [];
+
     const genero = (await get("generos/" + usuario.genero_id)).data;
     const ciudad = (await get("ciudades/" + usuario.ciudad_id)).data;      
 
@@ -131,7 +136,6 @@ function manejarErroresDeServidor(mensaje) {
   if (Array.isArray(mensaje.errors) && mensaje.errors.length > 0) {
     // Recorremos cada error y extraemos el mensaje correspondiente
     const errores = mensaje.errors.map(error => {
-      // Intentamos usar message, msg, o convertir el objeto completo a texto si no hay mensaje
       return `❌ ${error.message}`;
     });
 
@@ -179,6 +183,9 @@ formulario.addEventListener('submit', async (event) => {
   delete datosCambiados.lenguajes;
 
   try {
+    console.log(datosCambiados);
+    console.log(datos);
+    
     // Realizamos una petición POST al servidor para crear el usuario
     const respuesta = await post("usuarios", datosCambiados);
 
@@ -192,16 +199,16 @@ formulario.addEventListener('submit', async (event) => {
     }
 
     // Extraemos el usuario que se creó correctamente del objeto de respuesta
-    const usuarioCreado = resultado.usuarioCreado;
-
+    const usuarioCreado = resultado.data;    
     // Recorremos los lenguajes seleccionados por el usuario
     for (const lenguaje of datos.lenguajes) {
+      console.log("Lenguajes:", lenguaje, typeof parseInt(lenguaje));
       // Por cada lenguaje, enviamos una petición POST para crear la relación usuario-lenguaje
-      await post("lenguajes_usuarios", {id_usuario: usuarioCreado.id, lenguaje_id: lenguaje,});
+      await post("lenguajes_usuarios", { usuario_id: usuarioCreado.id, lenguaje_id: parseInt(lenguaje), });
     }
 
     alert("Formulario enviado.");    
-    event.target.reset();    
+    event.target.reset();
     boton.setAttribute('disabled', '');    
     location.reload();
 
@@ -223,7 +230,7 @@ addEventListener('DOMContentLoaded', async () => {
   // Obtenemos la lista de usuarios desde el servidor para mostrarla en la tabla
   const usuarios = await get('usuarios');
 
-  if (usuarios.message || usuarios.data.length === 0) return;
+  if (!usuarios.data || usuarios.data.length === 0) return;
 
   crearTablaUsuarios(usuarios.data);
 });
