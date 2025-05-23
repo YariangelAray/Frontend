@@ -1,5 +1,5 @@
 //importaciones
-import { validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "./JS/validaciones.js";
+import {valiarCampos20, validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "./JS/validaciones.js";
 import { get, post } from "./JS/api.js";
 import crearTabla from "./JS/crearTabla.js";
 
@@ -31,6 +31,9 @@ const habilitarBoton = () => {
 const cargarGeneros = async () => {
   const generos = await get('generos');  
   
+  //Validamos que haya géneros registrados
+  if (!generos.data || generos.data.length === 0) return;
+
   const contenedor = document.querySelector('.form__generos');
 
   generos.data.forEach((genero) => {
@@ -61,6 +64,9 @@ const cargarGeneros = async () => {
 const cargarCiudades = async () =>{
   const ciudades = await get('ciudades');
 
+  //Validamos que haya ciudades registrados
+  if (!ciudades.data || ciudades.data.length === 0) return;
+
   const contenedor = document.querySelector('.form__control select');
 
   ciudades.data.forEach((ciudad) => {
@@ -75,6 +81,9 @@ const cargarCiudades = async () =>{
 // Se obtiene la lista de lenguajes desde el servidor y se crean los elementos del formulario
 const cargarLenguajes = async () => {
   const lenguajes = await get('lenguajes');  
+
+  //Validamos que haya lenguajes registrados
+  if (!lenguajes.data || lenguajes.data.length === 0) return;
   
   const contenedor = document.querySelector('.form__lenguajes');
 
@@ -161,6 +170,8 @@ nombre.addEventListener('keydown', validarTexto);
 apellido.addEventListener('keydown', validarTexto);
 telefono.addEventListener('keydown', validarNumero);
 documento.addEventListener('keydown', validarNumero);
+usuario.addEventListener('keydown', valiarCampos20);
+contrasena.addEventListener('keydown', valiarCampos20);
 
 // Se agregan los eventos de validación a los campos del formulario para que se validen al perder el foco
 nombre.addEventListener('blur', validarCampo);
@@ -183,8 +194,6 @@ formulario.addEventListener('submit', async (event) => {
   delete datosCambiados.lenguajes;
 
   try {
-    console.log(datosCambiados);
-    console.log(datos);
     
     // Realizamos una petición POST al servidor para crear el usuario
     const respuesta = await post("usuarios", datosCambiados);
@@ -202,7 +211,6 @@ formulario.addEventListener('submit', async (event) => {
     const usuarioCreado = resultado.data;    
     // Recorremos los lenguajes seleccionados por el usuario
     for (const lenguaje of datos.lenguajes) {
-      console.log("Lenguajes:", lenguaje, typeof parseInt(lenguaje));
       // Por cada lenguaje, enviamos una petición POST para crear la relación usuario-lenguaje
       await post("lenguajes_usuarios", { usuario_id: usuarioCreado.id, lenguaje_id: parseInt(lenguaje), });
     }

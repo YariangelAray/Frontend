@@ -1,9 +1,22 @@
+// Validación para los campos que tengan 20 caracteres
+export const valiarCampos20 = (event) => {
+  const key = event.key; // Obtenemos la tecla presionada
+  const teclasEspeciales = ["Backspace", "Tab", "Enter", "ArrowLeft", "ArrowRight", "Delete"]; // Teclas especiales que se permiten
+
+  if ( event.target.value.length > 20 && !teclasEspeciales.includes(key)) { // Validamos si el campo supera los 20 caracteres
+
+    event.preventDefault(); // Evitamos la acción de la tecla
+  }
+}
 
 // Validación para los campos de texto
 export const validarTexto = (event) => {
   const key = event.key; // Obtenemos la tecla presionada
   const regex = /^[\D]*$/i;  // Expresión regular para letras y caracteres especiales
-  if (!regex.test(key) || event.target.value.length > 50) { // Validamos si la tecla no es una letra o si el campo supera los 40 caracteres
+  const teclasEspeciales = ["Backspace", "Tab", "Enter", "ArrowLeft", "ArrowRight", "Delete"]; // Teclas especiales que se permiten
+
+  if ((!regex.test(key) || event.target.value.length > 30) && !teclasEspeciales.includes(key)) { // Validamos si la tecla no es una letra o si el campo supera los 30 caracteres
+
     event.preventDefault(); // Evitamos la acción de la tecla
   }
 }

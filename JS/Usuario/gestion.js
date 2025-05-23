@@ -1,5 +1,5 @@
 //importaciones
-import { validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "../validaciones.js";
+import {valiarCampos20, validarCampo, validarCampos, validarNumero, validarTexto, validarCheckeo, datos } from "../validaciones.js";
 import { get, post, put, del } from "../api.js";
 
 // variables
@@ -28,7 +28,10 @@ const ciudadSelect = document.querySelector('[name="ciudad_id"]');
 
 const cargarGeneros = async () => {
   const generos = await get('generos');
-  
+
+  //Validamos que haya géneros registrados
+  if (!generos.data || generos.data.length === 0) return;
+
   const contenedor = document.querySelector('.form__generos');
 
   generos.data.forEach((genero) => {
@@ -49,7 +52,6 @@ const cargarGeneros = async () => {
     contenedor.append(label);
 
     // Validamos si el género del usuario coincide con el género del formulario y lo seleccionamos
-    console.log(input,usuarioObtenido);
     
     if (usuarioObtenido.genero_id == input.value) input.checked = true;
 
@@ -60,6 +62,9 @@ const cargarGeneros = async () => {
 
 const cargarCiudades = async () =>{
   const ciudades = await get('ciudades');
+
+  //Validamos que haya ciudades registrados
+  if (!ciudades.data || ciudades.data.length === 0) return;
   
   const contenedor = document.querySelector('.form__control select');
 
@@ -77,6 +82,9 @@ const cargarCiudades = async () =>{
 
 const cargarLenguajes = async () => {
   const lenguajes = await get('lenguajes');
+
+  //Validamos que haya lenguajes registrados
+  if (!lenguajes.data || lenguajes.data.length === 0) return;
   
   const contenedor = document.querySelector('.form__lenguajes');
 
@@ -98,8 +106,10 @@ const cargarLenguajes = async () => {
 
     input.addEventListener('change', validarCheckeo);
 
+    console.log(usuarioObtenido.lenguajes, input.value);
+    
     // Validamos si el lenguaje que fue agregado al formulario está en la lista de lenguajes del usuario y lo seleccionamos
-    if (usuarioObtenido.lenguajes.includes(input.value)) input.checked = true;
+    if (usuarioObtenido.lenguajes.includes(parseInt(input.value))) input.checked = true;
 
     contenedor.append(label);
   });
@@ -118,6 +128,27 @@ const asignarValores = async () => {
   contrasena.value = usuarioObtenido.contrasena;
 }
 
+
+// Esta función recibe la respuesta del servidor con errores y los muestra de forma clara
+function manejarErroresDeServidor(mensaje) {
+  // Verificamos si hay un arreglo de errores
+  if (Array.isArray(mensaje.errors) && mensaje.errors.length > 0) {
+    // Recorremos cada error y extraemos el mensaje correspondiente
+    const errores = mensaje.errors.map(error => {
+      return `❌ ${error.message}`;
+    });
+
+    // Mostramos todos los errores en un solo alert
+    alert(`Errores al actualizar el usuario:\n${errores.join('\n')}`);
+
+  } else alert(`❌ Error al actualizar el usuario: ${mensaje.message || "Error desconocido."}`);
+
+  // Mostramos la respuesta completa en la consola
+  console.warn("Respuesta del servidor con error:", mensaje);
+}
+
+
+
 // Ejecutamos las funciones para cargar los datos al formulario
 await cargarCiudades();
 await cargarGeneros();
@@ -130,6 +161,10 @@ nombre.addEventListener('keydown', validarTexto);
 apellido.addEventListener('keydown', validarTexto);
 telefono.addEventListener('keydown', validarNumero);
 documento.addEventListener('keydown', validarNumero);
+usuario.addEventListener('keydown', valiarCampos20);
+contrasena.addEventListener('keydown', valiarCampos20);
+
+
 
 nombre.addEventListener('blur', validarCampo);
 apellido.addEventListener('blur', validarCampo);
@@ -145,27 +180,41 @@ formulario.addEventListener('submit', async (event) => {
 
   // Validamos que todos los campos actualizados esten completos
   if (!validarCampos(event)) return;
+
+
+  // Copiamos los datos del formulario, excluyendo los lenguajes (que se manejan aparte)
+  const datosCambiados = { ...datos };
+  delete datosCambiados.lenguajes;
     
-  // Hacemos la petición PUT al servidor para actualizar el usuario
-  const respuesta = await put(`usuarios/${id}`, datos);
+  try {
+    // Hacemos la petición PUT al servidor para actualizar el usuario
+    const respuesta = await put(`usuarios/${id}`, datosCambiados);
+    
+    // Convertimos la respuesta a formato JSON
+    const resultado = await respuesta.json();
   
-  // Si la respuesta no es correcta, mostramos un mensaje de error  
-  if (!respuesta.ok) {    
-    alert(`Error al actualizar el usuario: \n❌ ${(await respuesta.json()).message}`);
-    return;
+    // Si la respuesta NO fue exitosa (por ejemplo, error 400 o 500), mostramos los errores
+    if (!respuesta.ok) {
+      manejarErroresDeServidor(resultado); // Usamos una función externa para mostrar bien los errores
+      return; // Detenemos el flujo si hay errores
+    }
+  
+    // Eliminamos los lenguajes del usuario para volver a crear la relación entre el usuario y los lenguajes
+    await del(`lenguajes_usuarios/usuario/${id}`);
+  
+    // Recorremos los lenguajes seleccionados y creamos una relación entre el usuario y los lenguajes
+    for (const lenguaje of datos.lenguajes) {
+      await post("lenguajes_usuarios", {usuario_id: id, lenguaje_id: parseInt(lenguaje)});
+    }  
+    
+    alert("Usuario actualizado.");
+  
+    location.reload(); // Recargamos la página para mostrar los nuevos datos del usuario en el formulario
+  } catch (error) {
+    // Capturamos errores inesperados como problemas de conexión o errores en el código
+    alert(`❌ Error inesperado: ${error.message}`);
+    console.error("Error interno:", error);
   }
-
-  // Eliminamos los lenguajes del usuario para volver a crear la relación entre el usuario y los lenguajes
-  await del(`lenguajes_usuarios/usuario/${id}`);
-
-  // Recorremos los lenguajes seleccionados y creamos una relación entre el usuario y los lenguajes
-  for (const lenguaje_id of datos.lenguajes) {
-    await post("lenguajes_usuarios", {usuario_id: id, lenguaje_id: lenguaje_id});
-  }  
-  
-  alert("Usuario actualizado.");
-
-  location.reload(); // Recargamos la página para mostrar los nuevos datos del usuario en el formulario
 });
 
 // Le agregamos el evento de eliminar al botón de eliminar
