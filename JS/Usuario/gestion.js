@@ -106,8 +106,6 @@ const cargarLenguajes = async () => {
 
     input.addEventListener('change', validarCheckeo);
 
-    console.log(usuarioObtenido.lenguajes, input.value);
-    
     // Validamos si el lenguaje que fue agregado al formulario está en la lista de lenguajes del usuario y lo seleccionamos
     if (usuarioObtenido.lenguajes.includes(parseInt(input.value))) input.checked = true;
 
